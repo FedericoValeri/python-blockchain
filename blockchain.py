@@ -68,7 +68,9 @@ while waiting_for_input:
     user_choice = get_user_choice()
     if user_choice == '1':
         tx_data = get_transaction_value()
-        add_transaction(tx_amount, get_last_blockchain_value())
+        # Pulls out data from tuple and store in variables
+        recipient, amount = tx_data
+        add_transaction(recipient, amount=amount)
     elif user_choice == '2':
         print_blockchain_elements()
     elif user_choice == 'h':
