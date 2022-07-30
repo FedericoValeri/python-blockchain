@@ -162,7 +162,7 @@ while waiting_for_input:
         print_blockchain_elements()
         print('Invalid blockchain')
         break
-    print(get_balance('Federico'))
+    print('Balance of {}: {:6.2f}'.format('Federico', get_balance('Federico')))
 
 
 print('Done')
