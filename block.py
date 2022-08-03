@@ -1,4 +1,3 @@
-"""Imports"""
 from time import time
 from utility.printable import Printable
 

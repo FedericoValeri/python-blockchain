@@ -1,3 +1,5 @@
+"""Base class for other entities"""
+
 class Printable:
     """A base class which implements printing functionality"""
     def __repr__(self):

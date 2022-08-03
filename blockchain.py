@@ -1,4 +1,3 @@
-"""Import reduce list function"""
 from functools import reduce
 import json
 
