@@ -1,9 +1,9 @@
 """Import hashing functions."""
-from hash_util import hash_string_256, hash_block
+from utility.hash_util import hash_string_256, hash_block
 
 
 class Verification:
-    """Verification class"""
+    """A helper class which offer various static and class-based verification methods"""
 
     @staticmethod
     def valid_proof(transactions, last_hash, proof):
