@@ -37,9 +37,11 @@ class Blockchain:
                 updated_blockchain = []
                 for block in blockchain:
                     coverted_tx = [Transaction(
-                        tx['sender'], tx['recipient'], tx['amount']) for tx in block['transactions']]
+                        tx['sender'], tx['recipient'],
+                        tx['amount']) for tx in block['transactions']]
                     updated_block = Block(
-                        block['index'], block['previous_hash'], coverted_tx, block['proof'], block['timestamp'])
+                        block['index'], block['previous_hash'],
+                        coverted_tx, block['proof'], block['timestamp'])
                     updated_blockchain.append(updated_block)
                 self.chain = updated_blockchain
                 open_transactions = json.loads(file_content[1])
@@ -58,8 +60,11 @@ class Blockchain:
         """Save blockchain + open transactions snapshot to a file."""
         try:
             with open('blockchain.txt', mode='w', encoding="utf-8") as file:
-                saveable_chain = [block.__dict__ for block in [Block(block_el.index, block_el.previous_hash, [
-                    tx.__dict__ for tx in block_el.transactions], block_el.proof, block_el.timestamp) for block_el in self.chain]]
+                saveable_chain = [block.__dict__ for block in [Block(
+                    block_el.index,
+                    block_el.previous_hash,
+                    [tx.__dict__ for tx in block_el.transactions],
+                    block_el.proof, block_el.timestamp) for block_el in self.chain]]
                 file.write(json.dumps(saveable_chain))
                 file.write('\n')
                 saveable_tx = [tx.__dict__ for tx in self.open_transactions]
@@ -78,8 +83,7 @@ class Blockchain:
         last_block = self.chain[-1]
         last_hash = hash_block(last_block)
         nonce = 0
-        verifier = Verification()
-        while not verifier.valid_proof(self.open_transactions, last_hash, nonce):
+        while not Verification.valid_proof(self.open_transactions, last_hash, nonce):
             nonce += 1
         return nonce
 
@@ -124,8 +128,7 @@ class Blockchain:
         #     'amount': amount
         # }
         transaction = Transaction(sender, recipient, amount)
-        verifier = Verification()
-        if verifier.verify_transaction(transaction, self.get_balance):
+        if Verification.verify_transaction(transaction, self.get_balance):
             self.open_transactions.append(transaction)
             self.save_data()
             return True
