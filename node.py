@@ -51,7 +51,8 @@ class Node:
                 tx_data = self.get_transaction_value()
                 # Pulls out data from tuple and store in variables
                 recipient, amount = tx_data
-                if self.blockchain.add_transaction(recipient, self.wallet.public_key, amount=amount):
+                signature = self.wallet.sign_transaction(self.wallet.public_key, recipient, amount)
+                if self.blockchain.add_transaction(recipient, self.wallet.public_key, signature, amount=amount):
                     print('Added transaction!')
                 else:
                     print('Transaction failed.')
