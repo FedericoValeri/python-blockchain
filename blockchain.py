@@ -50,7 +50,7 @@ class Blockchain:
                 updated_blockchain = []
                 for block in blockchain:
                     coverted_tx = [Transaction(
-                        tx['sender'], tx['recipient'],
+                        tx['sender'], tx['recipient'], tx['signature'],
                         tx['amount']) for tx in block['transactions']]
                     updated_block = Block(
                         block['index'], block['previous_hash'],
@@ -61,7 +61,7 @@ class Blockchain:
                 updated_transactions = []
                 for tx in open_transactions:
                     updated_transaction = Transaction(
-                        tx['sender'], tx['recipient'], tx['amount'])
+                        tx['sender'], tx['recipient'], tx['signature'], tx['amount'])
                     updated_transactions.append(updated_transaction)
                 self.__open_transactions = updated_transactions
         except (IOError, IndexError):
@@ -142,7 +142,7 @@ class Blockchain:
         # }
         if self.hosting_node is None:
             return False
-        transaction = Transaction(sender, recipient, amount)
+        transaction = Transaction(sender, recipient, signature, amount)
         if Verification.verify_transaction(transaction, self.get_balance):
             self.__open_transactions.append(transaction)
             self.save_data()
@@ -164,7 +164,7 @@ class Blockchain:
         #     'amount': MINING_REWARD
         # }
         reward_transaction = Transaction(
-            'MINING', self.hosting_node, MINING_REWARD)
+            'MINING', self.hosting_node, '', MINING_REWARD)
         # Use the range selector with only ':' to create a copy of a list
         copied_transactions = self.__open_transactions[:]
         copied_transactions.append(reward_transaction)
