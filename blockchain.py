@@ -6,7 +6,6 @@ from utility.verification import Verification
 from block import Block
 from transaction import Transaction
 from wallet import Wallet
-
 # Global variables
 MINING_REWARD = 10
 
@@ -14,15 +13,16 @@ MINING_REWARD = 10
 class Blockchain:
     """Blockchain class manages the chain of blocks as well as open transactions"""
 
-    def __init__(self, hosting_node_id):
+    def __init__(self, public_key, node_id):
         # Our starting block for the blockchain
         genesis_block = Block(0, '', [], 100, 0)
         # Initializing (empty) blockchain
         self.chain = [genesis_block]
         # Unhandled transactions
         self.__open_transactions = []
-        self.hosting_node = hosting_node_id
+        self.public_key = public_key
         self.__peer_nodes = set()
+        self.node_id = node_id
         self.load_data()
 
     @property
@@ -42,7 +42,7 @@ class Blockchain:
     def load_data(self):
         """Initialize blockchain + open transactions data from a file."""
         try:
-            with open('blockchain.txt', mode='r', encoding="utf-8") as file:
+            with open('blockchain-{}.txt'.format(self.node_id), mode='r', encoding="utf-8") as file:
                 # file_content = pickle.loads(file.read())
                 file_content = file.readlines()
                 # BLOCKCHAIN = file_content['chain']
@@ -76,7 +76,7 @@ class Blockchain:
     def save_data(self):
         """Save blockchain + open transactions snapshot to a file."""
         try:
-            with open('blockchain.txt', mode='w', encoding="utf-8") as file:
+            with open('blockchain-{}.txt'.format(self.node_id), mode='w', encoding="utf-8") as file:
                 saveable_chain = [block.__dict__ for block in [Block(
                     block_el.index,
                     block_el.previous_hash,
@@ -108,9 +108,9 @@ class Blockchain:
 
     def get_balance(self):
         """Calculate and return the balance for a participant."""
-        if self.hosting_node is None:
+        if self.public_key is None:
             return None
-        participant = self.hosting_node
+        participant = self.public_key
         # Nested list comprehension
         tx_sender = [[tx.amount for tx in block.transactions if tx.sender == participant]
                      for block in self.__chain]
@@ -148,7 +148,7 @@ class Blockchain:
         #     'recipient': recipient,
         #     'amount': amount
         # }
-        if self.hosting_node is None:
+        if self.public_key is None:
             return False
         transaction = Transaction(sender, recipient, signature, amount)
         if Verification.verify_transaction(transaction, self.get_balance):
@@ -159,7 +159,7 @@ class Blockchain:
 
     def mine_block(self):
         """Create a new block and add open transactions to it."""
-        if self.hosting_node is None:
+        if self.public_key is None:
             return None
         last_block = self.__chain[-1]
         # List comprehension
@@ -172,7 +172,7 @@ class Blockchain:
         #     'amount': MINING_REWARD
         # }
         reward_transaction = Transaction(
-            'MINING', self.hosting_node, '', MINING_REWARD)
+            'MINING', self.public_key, '', MINING_REWARD)
         # Use the range selector with only ':' to create a copy of a list
         copied_transactions = self.__open_transactions[:]
         for tx in copied_transactions:
@@ -203,7 +203,7 @@ class Blockchain:
         """
         self.__peer_nodes.discard(node)
         self.save_data()
-    
+
     def get_peer_nodes(self):
         """Return a list of all connected peer nodes."""
         return list(self.__peer_nodes)

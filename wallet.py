@@ -8,9 +8,10 @@ import Crypto.Random
 class Wallet:
     """Wallet class"""
 
-    def __init__(self):
+    def __init__(self, node_id):
         self.private_key = None
         self.public_key = None
+        self.node_id = node_id
 
     def create_keys(self):
         private_key, public_key = self.generate_keys()
@@ -20,7 +21,7 @@ class Wallet:
     def save_keys(self):
         if self.public_key is not None and self.private_key is not None:
             try:
-                with open('wallet.txt', mode='w', encoding='utf-8') as file:
+                with open('wallet-{}.txt'.format(self.node_id), mode='w', encoding='utf-8') as file:
                     file.write(self.public_key)
                     file.write('\n')
                     file.write(self.private_key)
@@ -31,7 +32,7 @@ class Wallet:
 
     def load_keys(self):
         try:
-            with open('wallet.txt', mode='r', encoding='utf-8') as file:
+            with open('wallet-{}.txt'.format(self.node_id), mode='r', encoding='utf-8') as file:
                 keys = file.readlines()
                 public_key = keys[0][:-1]
                 private_key = keys[1]
