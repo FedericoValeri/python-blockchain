@@ -1,6 +1,6 @@
 from functools import reduce
 import json
-
+import requests
 from utility.hash_util import hash_block
 from utility.verification import Verification
 from block import Block
@@ -154,6 +154,16 @@ class Blockchain:
         if Verification.verify_transaction(transaction, self.get_balance):
             self.__open_transactions.append(transaction)
             self.save_data()
+            for node in self.__peer_nodes:
+                url = 'http://{}/broadcast-transaction'.format(node)
+                try:
+                    response = requests.post(url, json={
+                        'sender': sender, 'recipient': recipient, 'amount': amount, 'signature': signature})
+                    if response.status_code == 400 or response.status_code == 500:
+                        print('Transaction declined, needs resolving')
+                        return False
+                except requests.exceptions.ConnectionError:
+                    continue
             return True
         return False
 
